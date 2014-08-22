@@ -9,16 +9,17 @@ import (
 	"time"
 )
 
-// Parser ...
+// Parser parse mysql slowlog to go struct.
 type Parser struct {
 }
 
-// NewParser ... 新しい Parser をつくる
+// NewParser returns new Parser
 func NewParser() Parser {
 	return Parser{}
 }
 
-// Parse ... ファイルをパースして結果を流す
+// Parse mysql slowlog.
+// You can receive parsed slowlog through channnel.
 func (p Parser) Parse(r io.Reader) <-chan Parsed {
 	ch := make(chan Parsed)
 
