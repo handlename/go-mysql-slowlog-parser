@@ -1,11 +1,11 @@
 package main
 
 import (
-	"errors"
 	"flag"
 	"fmt"
 	"log"
 	"os"
+	"time"
 
 	"github.com/handlename/go-mysql-slowlog-parser"
 )
@@ -13,6 +13,15 @@ import (
 func main() {
 	opts := parseOpts()
 	parser := slowlog.NewParser()
+
+	loc, err := time.LoadLocation(opts.location)
+
+	if err != nil {
+		log.Fatal(err)
+		os.Exit(1)
+	}
+
+	parser.Location = loc
 
 	stylist, err := selectStylist(opts.style)
 
@@ -30,7 +39,7 @@ type stylist func(slowlog.Parsed) string
 func selectStylist(style string) (s stylist, err error) {
 	switch style {
 	default:
-		return nil, errors.New("invalid style")
+		return nil, fmt.Errorf("invalid style\n")
 	case "ltsv":
 		return func(p slowlog.Parsed) string {
 			return p.AsLTSV()
@@ -43,16 +52,16 @@ func selectStylist(style string) (s stylist, err error) {
 }
 
 type opts struct {
-	style string
+	style    string
+	location string
 }
 
 func parseOpts() opts {
-	var (
-		style string
-	)
+	o := opts{}
 
-	flag.StringVar(&style, "style", "ltsv", "output style. \"ltsv\" or \"json\"")
+	flag.StringVar(&o.style, "style", "ltsv", "output style. \"ltsv\" or \"json\"")
+	flag.StringVar(&o.location, "location", "UTC", "location of slowlog's datetime")
 	flag.Parse()
 
-	return opts{style: style}
+	return o
 }

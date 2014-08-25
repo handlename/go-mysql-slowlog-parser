@@ -11,11 +11,13 @@ import (
 
 // Parser parse mysql slowlog to go struct.
 type Parser struct {
+	Location *time.Location
 }
 
 // NewParser returns new Parser
 func NewParser() Parser {
-	return Parser{}
+	loc, _ := time.LoadLocation("UTC")
+	return Parser{loc}
 }
 
 // Parse mysql slowlog.
@@ -43,9 +45,10 @@ func (p Parser) Parse(r io.Reader) <-chan Parsed {
 
 			// DateTime
 			if strings.HasPrefix(line, "# Time:") {
-				t, err := time.Parse(
+				t, err := time.ParseInLocation(
 					"060102 15:04:05.999999",
-					strings.Replace(line, "# Time: ", "", 1))
+					strings.Replace(line, "# Time: ", "", 1),
+					p.Location)
 
 				if err != nil {
 					log.Println(err)
