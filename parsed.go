@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-// Parsed ...
+// Parsed is struct store values of parsed slowlog.
 type Parsed struct {
 	Datetime     int64   `json:"datetime"`
 	User         string  `json:"user"`
@@ -18,7 +18,7 @@ type Parsed struct {
 	Sql          string  `json:"sql"`
 }
 
-// AsLTSV ...
+// AsLTSV returns parsed slowlog as LTSV format.
 func (p *Parsed) AsLTSV() string {
 	return strings.Join([]string{
 		fmt.Sprintf("datetime:%d", p.Datetime),
@@ -32,7 +32,7 @@ func (p *Parsed) AsLTSV() string {
 	}, "\t")
 }
 
-// AsJSON ...
+// AsJSON returns parsed slowlog as JSON format.
 func (p *Parsed) AsJSON() string {
 	j, _ := json.Marshal(p)
 	return string(j)
